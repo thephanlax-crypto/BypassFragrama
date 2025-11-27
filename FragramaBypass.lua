@@ -313,7 +313,7 @@ local function sendToWebhook(link, foundAnimals)
         "Las Sis",
         "Los Primos",
         "La Supreme Combinasion",
-        "Tang Tang Kelentang"
+        "Tang Tang Kelentang",
         "Ketupat Kepat"
     }
 
