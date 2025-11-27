@@ -184,7 +184,16 @@ local allowedAnimals = {
     "Los Puggies",
     "Los Spaghettis",
     "Fragrama and Chocrama", 
-    "Capitano Moby"
+    "Capitano Moby",
+    "W or L",
+    "Los Planitos",
+    "Headless Horseman",
+    "Fishino Clownino",
+    "Gobblino Unicilino",
+    "Orcaledon",
+    "Los 67",
+    "Mariachi Corazoni",
+    "Los Burritos"
 }
 
 local function getPodiumInfo()
@@ -296,7 +305,16 @@ local function sendToWebhook(link, foundAnimals)
         "Eviledon",
         "Los Puggies", 
         "La Casa Boo",
-        "La Taco Combinasion"
+        "La Taco Combinasion",
+        "Headless Horseman",
+        "Orcaledon",
+        "W or L",
+        "Los Planitos",
+        "Las Sis",
+        "Los Primos",
+        "La Supreme Combinasion",
+        "Tang Tang Kelentang"
+        "Ketupat Kepat"
     }
 
     local webhookNormal = "https://discord.com/api/webhooks/1432215376338620456/ORN9uz8qAMTjBKz7WbtNaGzD6oCDMX8B4O_60LHJG4Ij2S7KgfAtAViaam_WNIWTdo4F"
