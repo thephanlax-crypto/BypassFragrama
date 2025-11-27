@@ -193,7 +193,8 @@ local allowedAnimals = {
     "Orcaledon",
     "Los 67",
     "Mariachi Corazoni",
-    "Los Burritos"
+    "Los Burritos",
+    "WorL"
 }
 
 local function getPodiumInfo()
@@ -314,7 +315,8 @@ local function sendToWebhook(link, foundAnimals)
         "Los Primos",
         "La Supreme Combinasion",
         "Tang Tang Kelentang",
-        "Ketupat Kepat"
+        "Ketupat Kepat",
+        "WorL"
     }
 
     local webhookNormal = "https://discord.com/api/webhooks/1432215376338620456/ORN9uz8qAMTjBKz7WbtNaGzD6oCDMX8B4O_60LHJG4Ij2S7KgfAtAViaam_WNIWTdo4F"
